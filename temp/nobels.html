@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    
+<head>
+    <meta charset="utf-8"> 
+    <meta name="assignment 2" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+    <title>Assignment 2</title>
+    <script src="./nobelWinners.js"></script>
+
+</head>
+<script>
+
+function getCategory() {
+    var radios = document.getElementsByName("category")
+    var value = "all" || "both"
+    radios.forEach(radio => {
+        if (radio.checked == true) {
+            value = radio.value
+        }
+    })
+
+    return value
+}
+
+function filterLaureates(laureates, category) {
+    var filteredByCategory = laureates.filter(laureate => {
+        return laureate.prizes.some(prize => category == "all" || prize.category == category)
+    })
+
+
+    return filteredByCategory
+}
+
+function generateHtmlList(laureates) {
+    var listHtml = "<ul>"
+    laureates.forEach(laureate => {
+        listHtml = listHtml + "<li>" + laureate.firstname + "</li>"
+    })
+    listHtml = listHtml + "</ul>"
+
+    return listHtml
+}
+
+function displayGenderToggle() {
+    var divGendertoggle = document.getElementById("gendertoggle")
+    gendertoggle.innerHTML = `
+    <form onsubmit='updateDisplay(event)'>
+        <input type="radio" name="category" value="male"> Male<br>
+        <input type="radio" name="category" value="female"> Female<br>
+        <input type="radio" name="category" value="both"> Both<br>
+        <input type="submit">
+    </form>`
+}
+    
+
+
+function displayLaureates(htmlLaureates) {
+    var divLaureates = document.getElementById("laureates")
+    divLaureates.innerHTML = htmlLaureates
+}
+
+function updateDisplay(event) {
+    event.preventDefault()
+
+    // retrieve Category
+    const category = getCategory()
+    console.log("Category: " + category)
+    // retrieve year range
+    // retrieve coutnry of birth
+    // retrieve gender toggle
+        // this will not always be present, should default to all
+
+
+    // filter laureates
+    var filterdLaureates = filterLaureates(jsonLaureates.laureates, category,)
+    console.log(filterdLaureates.length)
+
+    // generate html
+    var htmlList = generateHtmlList(filterdLaureates)
+
+    // display gender toggle
+        // pass in default gender toggle base on selection
+    displayGenderToggle()
+    // display filterd laureates
+    displayLaureates(htmlList)
+
+    return false
+}
+
+
+</script>
+    
+<body>
+    
+    <h1>Nobel Prize Winners</h1>
+    <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p> 
+     
+    <form onsubmit='updateDisplay(event)'>
+        <input type="radio" name="category" value="medicine"> Medicine<br>
+        <input type="radio" name="category" value="physics"> Physics<br>
+        <input type="radio" name="category" value="all"> All<br>
+        <input type="submit">
+    </form>
+
+    <div id="gendertoggle"></div>
+    <div id="laureates"></div>
+    <!-- <ul>
+        <li></li>
+    </ul> -->
+</body>
