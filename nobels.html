@@ -11,15 +11,16 @@
 </head>
 <body>  
 
-    <h1>Nobel Prize Winners</h1>
-    <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p>  
-    
-    <select id="startYear">...</select>
-    <select id="endYear">...</select>
-    <select id="categories">...</select>
-    <select id="bornCountry">...</select>
-    <button onclick="submitCriteria()">Submit</button>
-    <p id="filterNobels"></p>
+  <h1>Nobel Prize Winners</h1>
+  <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p>  
+
+  <select id="startYear">...</select>
+  <select id="endYear">...</select>
+  <select id="categories">...</select>
+  <select id="bornCountry">...</select>
+  <button onclick="submitCriteria()">Submit</button>
+  <div id="gendertoggle"></div>
+  <p id="filterNobels"></p>
     
   
 <script>  
@@ -82,8 +83,6 @@ function displayCountries(laureates) {
 
   document.getElementById("bornCountry").innerHTML = options
 }
-
-//Dropdown for year using https://stackoverflow.com/questions/20873302/html-looping-option-values-in-drop-down-list
     
 function displayYearRange(laureates) {
   var startYear = new Set([])
@@ -124,35 +123,37 @@ function displayYearRange(laureates) {
   
 }
 function submitCriteria() {
-  category = document.getElementById("categories").value
+  const category = document.getElementById("categories").value
   // get selected born country
-  country = document.getElementById("bornCountry").value
+  const country = document.getElementById("bornCountry").value
   // get start year
-  
+  const startYear = document.getElementById("startYear").value
   // get end year
-
-  // filter nobels
+  const endYear = document.getElementById("endYear").value
   
-  var filteredCountries = laureates.filter(laureate => {
-    if (laureate.bornCountry === undefined) console.log(laureate)
+  
+  const filteredCountries = laureates.filter(laureate => {
     return country === ALL || laureate.bornCountry !== undefined && laureate.bornCountry.toLowerCase() === country.toLowerCase()
   })
-    
-    
-    
-  var filteredLaureates = filteredCountries.filter(laureate => laureate.prizes.some(prize => {
-    return category === ALL || prize.category === category.toLowerCase()
+        
+  const filteredLaureates = filteredCountries.filter(laureate => laureate.prizes.some(prize => {
+    var isStartYear = parseInt(prize.year) >= parseInt(startYear)
+    var isEndYear = parseInt(prize.year) <= parseInt(endYear)
+    var isInRange = isStartYear && isEndYear
+    var isAll = (category === ALL)
+    return isInRange && (isAll || prize.category === category.toLowerCase())
   }))
   
-  var filteredCategories = removeOtherCategories(filteredLaureates, category)
+  const filteredCategories = removeOtherCategories(filteredLaureates, category)
   
   
-  var laureatesHtml = filteredCategories.reduce((acc, laureate) => {
+  const laureatesHtml = filteredCategories.reduce((acc, laureate) => {
     return `${acc}<tr><td>${laureate.firstname}</td><td>${laureate.surname}</td><td>${htmlForCategoryCell(laureate.prizes)}</td><td>${htmlForYearCell(laureate.prizes)}</td></tr>` 
   }, "<table><tr><th>Firstname</th><th>Surname</th><th>Category</th><th>Year</th></tr>") + "</table>"
   
   document.getElementById("filterNobels").innerHTML = laureatesHtml
   
+  displayGenderToggle()
   
 }
   
@@ -172,7 +173,22 @@ function removeOtherCategories(laureates, category) {
     return Object.assign({},laureate, {prizes: filteredPrizes})
   })
 }
+  
+function displayGenderToggle() {
+  var divGenderToggle = document.getElementById("gendertoggle")
+  divGenderToggle.innerHTML = `<form onsubmit = 'updateDisplay(event)'>
+    <input type="radio" name="gender" value="female">Female<br>
+    <input type="radio" name="gender" value="male">Male<br>
+    <input type="radio" name="gender" value="both">Both<br>
+    <input type="submit">
+  </form>`
+}
 
+function updateDisplay(evemt) {
+  event.preventDefault()
+  displayGenderToggle()
+  return false
+}
   
 </script>
 </body>
