@@ -16,37 +16,98 @@
     
     <select id="startYear">...</select>
     <select id="endYear">...</select>
-   
-<script>
+    <select id="categories">...</select>
+    <select id="bornCountry">...</select>
+    <button onclick="submitCriteria()">Submit</button>
+    <p id="filterNobels"></p>
+    
+  
+<script>  
+  
 function loadNobelWinners() {
  var xmlhttp = new XMLHttpRequest()
  var url = "nobelWinners.json"
 
   xmlhttp.onreadystatechange = function() {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {        
-          var nobelWinners = JSON.parse(xmlhttp.responseText);
-          console.log(nobelWinners)
+          window.nobelWinners = JSON.parse(xmlhttp.responseText)
+          displayYearRange(nobelWinners)
+          displayCategories(nobelWinners)
+          displayCountries(nobelWinners)
       }
   }
-  xmlhttp.open("GET", url, true);
-  xmlhttp.send();
+  xmlhttp.open("GET", url, true)
+  xmlhttp.send()
 }
 
 loadNobelWinners()
+  
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+  
+function displayCategories(nobels) {
+  var categories = new Set(["All"])
+  for (var i = 0; i < nobels.laureates.length; i++) {
+    for (var j = 0; j < nobels.laureates[i].prizes.length; j++) {
+      var category = nobels.laureates[i].prizes[j].category
+      if (category !== undefined ) {
+        categories.add(category)
+      }
+    }
+  }
+  
+  var options = "";
+  Array.from(categories).sort().forEach(category => {
+      options += "<option>" + capitalizeFirstLetter(category) + "</option>"
+  })  
 
+  document.getElementById("categories").innerHTML = options
+}
+
+function displayCountries(nobels) {
+  var countries = new Set(["All"])
+  for (var i = 0; i < nobels.laureates.length; i++) {
+      var bornCountry = nobels.laureates[i].bornCountry
+      if (bornCountry !== undefined ) {
+        countries.add(bornCountry)
+      }
+    }
+  
+  var options = "";
+  Array.from(countries).sort().forEach(bornCountry => {
+      options += "<option>" + capitalizeFirstLetter(bornCountry) + "</option>"
+  })  
+
+  document.getElementById("bornCountry").innerHTML = options
+}
 
 //Dropdown for year using https://stackoverflow.com/questions/20873302/html-looping-option-values-in-drop-down-list
     
-var startyear = 1901;
-var until = 2018;
-var options = "";
-for(var startyear; startyear <= until; startyear++){
-    options += "<option>" + startyear + "</option>";
+function displayYearRange(nobels) {
+  var startyear = 1901
+  var until = 2018
+  var options = ""
+  for(var startyear; startyear <= until; startyear++){
+      options += "<option>" + startyear + "</option>"
+  }
+
+  document.getElementById("startYear").innerHTML = options;
+
+  var endyear = 2018;
+  var untilstart = 1901;
+  var optionsEnd = "";
+  for(var endyear; endyear >= untilstart; endyear--){
+      optionsEnd += "<option>" + endyear + "</option>"
+  }  
+
+  document.getElementById("endYear").innerHTML = optionsEnd  
 }
-document.getElementById("startYear").innerHTML = options;
-document.getElementById("endYear").innerHTML = options;   
-    
-    
+
+function submitCriteria() {
+  console.log("Submitting Criteria")
+}  
+  
 </script>
 </body>
 </html>
