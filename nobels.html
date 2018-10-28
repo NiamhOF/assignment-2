@@ -31,10 +31,10 @@ function loadNobelWinners() {
 
   xmlhttp.onreadystatechange = function() {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {        
-          window.nobelWinners = JSON.parse(xmlhttp.responseText)
-          displayYearRange(nobelWinners)
-          displayCategories(nobelWinners)
-          displayCountries(nobelWinners)
+          window.laureates = JSON.parse(xmlhttp.responseText).laureates.filter(laureate => laureate.firstname !== undefined)
+          displayYearRange(laureates)
+          displayCategories(laureates)
+          displayCountries(laureates)
       }
   }
   xmlhttp.open("GET", url, true)
@@ -47,11 +47,11 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
   
-function displayCategories(nobels) {
+function displayCategories(laureates) {
   var categories = new Set([ALL])
-  for (var i = 0; i < nobels.laureates.length; i++) {
-    for (var j = 0; j < nobels.laureates[i].prizes.length; j++) {
-      var category = nobels.laureates[i].prizes[j].category
+  for (var i = 0; i < laureates.length; i++) {
+    for (var j = 0; j < laureates[i].prizes.length; j++) {
+      var category = laureates[i].prizes[j].category
       if (category !== undefined ) {
         categories.add(category)
       }
@@ -66,10 +66,10 @@ function displayCategories(nobels) {
   document.getElementById("categories").innerHTML = options
 }
 
-function displayCountries(nobels) {
+function displayCountries(laureates) {
   var countries = new Set([ALL])
-  for (var i = 0; i < nobels.laureates.length; i++) {
-      var bornCountry = nobels.laureates[i].bornCountry
+  for (var i = 0; i < laureates.length; i++) {
+      var bornCountry = laureates[i].bornCountry
       if (bornCountry !== undefined ) {
         countries.add(bornCountry)
       }
@@ -85,11 +85,11 @@ function displayCountries(nobels) {
 
 //Dropdown for year using https://stackoverflow.com/questions/20873302/html-looping-option-values-in-drop-down-list
     
-function displayYearRange(nobels) {
+function displayYearRange(laureates) {
   var startYear = new Set([])
-  for (var i = 0; i < nobels.laureates.length; i++) {
-    for (var j = 0; j < nobels.laureates[i].prizes.length; j++) {
-      var start = nobels.laureates[i].prizes[j].year
+  for (var i = 0; i < laureates.length; i++) {
+    for (var j = 0; j < laureates[i].prizes.length; j++) {
+      var start = laureates[i].prizes[j].year
       if (start !== undefined ) {
         startYear.add(start)
       }
@@ -106,9 +106,9 @@ function displayYearRange(nobels) {
   
   
   var endYear = new Set([])
-  for (var i = 0; i < nobels.laureates.length; i++) {
-    for (var j = 0; j < nobels.laureates[i].prizes.length; j++) {
-      var end = nobels.laureates[i].prizes[j].year
+  for (var i = 0; i < laureates.length; i++) {
+    for (var j = 0; j < laureates[i].prizes.length; j++) {
+      var end = laureates[i].prizes[j].year
       if (end !== undefined ) {
         endYear.add(end)
       }
@@ -132,7 +132,15 @@ function submitCriteria() {
   // get end year
 
   // filter nobels
-  var filteredLaureates = nobelWinners.laureates.filter(laureate => laureate.prizes.some(prize => {
+  
+  var filteredCountries = laureates.filter(laureate => {
+    if (laureate.bornCountry === undefined) console.log(laureate)
+    return country === ALL || laureate.bornCountry !== undefined && laureate.bornCountry.toLowerCase() === country.toLowerCase()
+  })
+    
+    
+    
+  var filteredLaureates = filteredCountries.filter(laureate => laureate.prizes.some(prize => {
     return category === ALL || prize.category === category.toLowerCase()
   }))
   
