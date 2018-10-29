@@ -20,7 +20,7 @@
   <select id="bornCountry">...</select>
   <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
   <div id="gendertoggle"></div>
-  <p id="filterNobels"></p>
+  <div id="filterNobels"></div>
     
   
 <script>  
@@ -133,11 +133,11 @@ function submitCriteria(laureates, gender) {
   const endYear = document.getElementById("endYear").value
   
   
-  const filteredCountries = laureates.filter(laureate => {
+  const filteredByCountries = laureates.filter(laureate => {
     return country === ALL || laureate.bornCountry !== undefined && laureate.bornCountry.toLowerCase() === country.toLowerCase()
   })
         
-  const filteredLaureates = filteredCountries.filter(laureate => laureate.prizes.some(prize => {
+  const filteredByYears = filteredByCountries.filter(laureate => laureate.prizes.some(prize => {
     var isStartYear = parseInt(prize.year) >= parseInt(startYear)
     var isEndYear = parseInt(prize.year) <= parseInt(endYear)
     var isInRange = isStartYear && isEndYear
@@ -145,17 +145,39 @@ function submitCriteria(laureates, gender) {
     return isInRange && (isAll || prize.category === category.toLowerCase())
   }))
   
-  const filteredCategories = removeOtherCategories(filteredLaureates, category)
-  
-  
-  const laureatesHtml = filteredCategories.reduce((acc, laureate) => {
-    return `${acc}<tr><td>${laureate.firstname}</td><td>${laureate.surname}</td><td>${htmlForCategoryCell(laureate.prizes)}</td><td>${htmlForYearCell(laureate.prizes)}</td></tr>` 
-  }, "<table><tr><th>Firstname</th><th>Surname</th><th>Category</th><th>Year</th></tr>") + "</table>"
+  const filteredLaureates = removeOtherCategories(filteredByYears, category)
+  window.filteredLaureates = filteredLaureates
+  const header = '<table><tr><th>Firstname</th><th>Surname</th><th>Category</th><th>Year</th></tr>'
+  var id = -1
+  const laureatesHtml = filteredLaureates.reduce((acc, laureate) => {
+    id = id + 1
+    return `${acc}<tr id="${id}" onclick="displayDetailedInfo(${id})">
+    <td>${laureate.firstname}</td>
+    <td>${laureate.surname}</td>
+    <td>${htmlForCategoryCell(laureate.prizes)}</td>
+    <td>${htmlForYearCell(laureate.prizes)}</td>
+    </tr><tr id="${id}-extra"></tr>` 
+  }, header) + "</table>"
   
   document.getElementById("filterNobels").innerHTML = laureatesHtml
   
   displayGenderToggle(gender)
   
+}
+
+function displayDetailedInfo(id) {
+  const laureate = window.filteredLaureates[id]
+  console.log(laureate)
+  const tableRowExtra = document.getElementById(`${id}-extra`)
+  const display = tableRowExtra.innerHTML.length === 0
+  if (display) {
+    tableRowExtra.innerHTML = `<table>
+    <tr><td>Date of Birth</td><td colspan=3> ${laureate.born}</td>
+    
+    </table>`
+  } else {
+    tableRowExtra.innerHTML = ``
+  }
 }
   
 function htmlForCategoryCell(prizes) {
@@ -188,6 +210,8 @@ function displayGenderToggle(gender) {
   } else {
     allChecked = 'checked="checked"'
   }
+ 
+// https://stackoverflow.com/questions/5592345/how-to-select-a-radio-button-by-default used for help with radio buttons
   
   divGenderToggle.innerHTML = `
     <input type="radio" name="gender" onchange="genderfilter(this, 'female')" value="female" ${femaleChecked}>Female<br>
