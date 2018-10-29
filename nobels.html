@@ -153,10 +153,11 @@ function submitCriteria(laureates, gender) {
     id = id + 1
     return `${acc}<tr id="${id}" onclick="displayDetailedInfo(${id})">
     <td>${laureate.firstname}</td>
-    <td>${laureate.surname}</td>
+    <td>${laureate.surname || ""}</td>
     <td>${htmlForCategoryCell(laureate.prizes)}</td>
     <td>${htmlForYearCell(laureate.prizes)}</td>
-    </tr><tr id="${id}-extra"></tr>` 
+    </tr>
+    <tr id="${id}-extra" colspan=4></tr>` 
   }, header) + "</table>"
   
   document.getElementById("filterNobels").innerHTML = laureatesHtml
@@ -170,11 +171,17 @@ function displayDetailedInfo(id) {
   console.log(laureate)
   const tableRowExtra = document.getElementById(`${id}-extra`)
   const display = tableRowExtra.innerHTML.length === 0
+  const birthString = laureate.born === '0000-00-00' ? '' : `<li id="infotitle">Date of Birth: ${laureate.born}</li>`
+  const deathString = laureate.died === '0000-00-00' ? '' : `<li id="infotitle">Date of Death: ${laureate.died}</li>`
+  const bornString = laureate.bornCity === undefined ? '' : `<li id="infotitle">City of Birth: ${laureate.bornCity}</li>`
   if (display) {
-    tableRowExtra.innerHTML = `<table>
-    <tr><td>Date of Birth</td><td colspan=3> ${laureate.born}</td>
-    
-    </table>`
+    tableRowExtra.innerHTML = `<ul>
+    ${birthString}
+    ${deathString}
+    ${bornString}
+    <li id="infotitle">Motivation: ${htmlForMotivation(laureate.prizes) || "No Information Available"}</li>
+    <li id="infotitle">Affiliations: ${htmlForAffiliation(laureate.prizes)  || "No Information Available"}</li>
+    </ul>`
   } else {
     tableRowExtra.innerHTML = ``
   }
@@ -187,8 +194,29 @@ function htmlForCategoryCell(prizes) {
 function htmlForYearCell(prizes) {
   return prizes.map(prize => prize.year).join(", ")
 }
-  
-  
+
+function htmlForMotivation(prizes) {
+  return prizes.flatMap(prize => {
+    if (prize.motivation === undefined) {
+        return []
+      } else {
+        return [prize.motivation]
+      }
+    }).join(" & ")
+}  
+
+function htmlForAffiliation(prizes) {
+  return prizes
+    .flatMap(prize => prize.affiliations.reduce((acc, affiliation) => {
+      if (Array.isArray(affiliation)) {
+        return acc 
+      } else {
+        acc.push(`${affiliation.city} ${affiliation.country} ${affiliation.name}`)
+        return acc
+      }
+    },[])).join(" & ")
+} 
+
 function removeOtherCategories(laureates, category) {
   return laureates.map(laureate => {
     filteredPrizes = laureate.prizes.filter(prize => category === ALL || prize.category === category.toLowerCase())
