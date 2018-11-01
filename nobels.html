@@ -2,261 +2,27 @@
 <html lang="en">
     
 <head>
-    <meta charset="utf-8"> 
-    <meta name="assignment 2" content="width=device-width, initial-scale=1">
-<!--    <link rel="stylesheet" href="../css/styles.css">-->
-    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
-    <title>Assignment 2</title>
+  <meta charset="utf-8"> 
+  <meta name="assignment 2" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./css/nobels-style.css">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <title>Assignment 2</title>
+  <script src="./javascript/nobels.js"></script>
     
 </head>
 <body>  
 
   <h1>Nobel Prize Winners</h1>
-  <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p>  
+  <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p>
+  <p id="error"></p>
 
-  <select id="startYear">...</select>
+  <select id="startYear">JSON file unavailable</select>
   <select id="endYear">...</select>
   <select id="categories">...</select>
   <select id="bornCountry">...</select>
   <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
   <div id="gendertoggle"></div>
   <div id="filterNobels"></div>
-    
-  
-<script>  
-const ALL = "All"
-  
-function loadNobelWinners() {
- var xmlhttp = new XMLHttpRequest()
- var url = "nobelWinners.json"
 
-  xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {        
-          window.laureates = JSON.parse(xmlhttp.responseText).laureates.filter(laureate => laureate.firstname !== undefined)
-          displayYearRange(laureates)
-          displayCategories(laureates)
-          displayCountries(laureates)
-      }
-  }
-  xmlhttp.open("GET", url, true)
-  xmlhttp.send()
-}
-
-loadNobelWinners()
-  
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}
-  
-function displayCategories(laureates) {
-  var categories = new Set([ALL])
-  for (var i = 0; i < laureates.length; i++) {
-    for (var j = 0; j < laureates[i].prizes.length; j++) {
-      var category = laureates[i].prizes[j].category
-      if (category !== undefined ) {
-        categories.add(category)
-      }
-    }
-  }
-  
-  var options = "";
-  Array.from(categories).sort().forEach(category => {
-      options += "<option>" + capitalizeFirstLetter(category) + "</option>"
-  })  
-
-  document.getElementById("categories").innerHTML = options
-}
-
-function displayCountries(laureates) {
-  var countries = new Set([ALL])
-  for (var i = 0; i < laureates.length; i++) {
-      var bornCountry = laureates[i].bornCountry
-      if (bornCountry !== undefined ) {
-        countries.add(bornCountry)
-      }
-    }
-  
-  var options = "";
-  Array.from(countries).sort().forEach(bornCountry => {
-      options += "<option>" + capitalizeFirstLetter(bornCountry) + "</option>"
-  })  
-
-  document.getElementById("bornCountry").innerHTML = options
-}
-    
-function displayYearRange(laureates) {
-  var startYear = new Set([])
-  for (var i = 0; i < laureates.length; i++) {
-    for (var j = 0; j < laureates[i].prizes.length; j++) {
-      var start = laureates[i].prizes[j].year
-      if (start !== undefined ) {
-        startYear.add(start)
-      }
-    }
-  }
-
-  var startOptions = ""
-  Array.from(startYear).sort().forEach(startYear => {
-    startOptions += "<option>" + startYear +"</option>"
-  })
-
-  document.getElementById("startYear").innerHTML = startOptions
-  
-  
-  
-  var endYear = new Set([])
-  for (var i = 0; i < laureates.length; i++) {
-    for (var j = 0; j < laureates[i].prizes.length; j++) {
-      var end = laureates[i].prizes[j].year
-      if (end !== undefined ) {
-        endYear.add(end)
-      }
-    }
-  }
-  
-  var endOptions = ""
-  Array.from(endYear).sort().reverse().forEach(endYear => {
-    endOptions += "<option>" + endYear +"</option>"
-  })
-
-  document.getElementById("endYear").innerHTML = endOptions
-  
-}
-  
-function submitCriteria(laureates, gender) {
-  const category = document.getElementById("categories").value
-  // get selected born country
-  const country = document.getElementById("bornCountry").value
-  // get start year
-  const startYear = document.getElementById("startYear").value
-  // get end year
-  const endYear = document.getElementById("endYear").value
-  
-  
-  const filteredByCountries = laureates.filter(laureate => {
-    return country === ALL || laureate.bornCountry !== undefined && laureate.bornCountry.toLowerCase() === country.toLowerCase()
-  })
-        
-  const filteredByYears = filteredByCountries.filter(laureate => laureate.prizes.some(prize => {
-    var isStartYear = parseInt(prize.year) >= parseInt(startYear)
-    var isEndYear = parseInt(prize.year) <= parseInt(endYear)
-    var isInRange = isStartYear && isEndYear
-    var isAll = (category === ALL)
-    return isInRange && (isAll || prize.category === category.toLowerCase())
-  }))
-  
-  const filteredLaureates = removeOtherCategories(filteredByYears, category)
-  window.filteredLaureates = filteredLaureates
-  const header = '<table><tr><th>Firstname</th><th>Surname</th><th>Category</th><th>Year</th></tr>'
-  var id = -1
-  const laureatesHtml = filteredLaureates.reduce((acc, laureate) => {
-    id = id + 1
-    return `${acc}<tr id="${id}" onclick="displayDetailedInfo(${id})">
-    <td>${laureate.firstname}</td>
-    <td>${laureate.surname || ""}</td>
-    <td>${htmlForCategoryCell(laureate.prizes)}</td>
-    <td>${htmlForYearCell(laureate.prizes)}</td>
-    </tr>
-    <tr id="${id}-extra" colspan=4></tr>` 
-  }, header) + "</table>"
-  
-  document.getElementById("filterNobels").innerHTML = laureatesHtml
-  
-  displayGenderToggle(gender)
-  
-}
-
-function displayDetailedInfo(id) {
-  const laureate = window.filteredLaureates[id]
-  console.log(laureate)
-  const tableRowExtra = document.getElementById(`${id}-extra`)
-  const display = tableRowExtra.innerHTML.length === 0
-  const birthString = laureate.born === '0000-00-00' ? '' : `<li id="infotitle">Date of Birth: ${laureate.born}</li>`
-  const deathString = laureate.died === '0000-00-00' ? '' : `<li id="infotitle">Date of Death: ${laureate.died}</li>`
-  const bornString = laureate.bornCity === undefined ? '' : `<li id="infotitle">City of Birth: ${laureate.bornCity}</li>`
-  if (display) {
-    tableRowExtra.innerHTML = `<ul>
-    ${birthString}
-    ${deathString}
-    ${bornString}
-    <li id="infotitle">Motivation: ${htmlForMotivation(laureate.prizes) || "No Information Available"}</li>
-    <li id="infotitle">Affiliations: ${htmlForAffiliation(laureate.prizes)  || "No Information Available"}</li>
-    </ul>`
-  } else {
-    tableRowExtra.innerHTML = ``
-  }
-}
-  
-function htmlForCategoryCell(prizes) {
-  return prizes.map(prize => prize.category).join(", ")
-}
-  
-function htmlForYearCell(prizes) {
-  return prizes.map(prize => prize.year).join(", ")
-}
-
-function htmlForMotivation(prizes) {
-  return prizes.flatMap(prize => {
-    if (prize.motivation === undefined) {
-        return []
-      } else {
-        return [prize.motivation]
-      }
-    }).join(" & ")
-}  
-
-function htmlForAffiliation(prizes) {
-  return prizes
-    .flatMap(prize => prize.affiliations.reduce((acc, affiliation) => {
-      if (Array.isArray(affiliation)) {
-        return acc 
-      } else {
-        acc.push(`${affiliation.city} ${affiliation.country} ${affiliation.name}`)
-        return acc
-      }
-    },[])).join(" & ")
-} 
-
-function removeOtherCategories(laureates, category) {
-  return laureates.map(laureate => {
-    filteredPrizes = laureate.prizes.filter(prize => category === ALL || prize.category === category.toLowerCase())
-    
-    return Object.assign({},laureate, {prizes: filteredPrizes})
-  })
-}
-  
-function displayGenderToggle(gender) {
-  var divGenderToggle = document.getElementById('gendertoggle')
-  var maleChecked = ''
-  var femaleChecked = ''
-  var allChecked = ''
-  
-  if (gender === 'male') {
-    maleChecked='checked="checked"' 
-  } else if (gender === 'female') {
-    femaleChecked='checked="checked"' 
-  } else {
-    allChecked = 'checked="checked"'
-  }
- 
-// https://stackoverflow.com/questions/5592345/how-to-select-a-radio-button-by-default used for help with radio buttons
-  
-  divGenderToggle.innerHTML = `
-    <input type="radio" name="gender" onchange="genderfilter(this, 'female')" value="female" ${femaleChecked}>Female<br>
-    <input type="radio" name="gender" onchange="genderfilter(this, 'male')"   value="male"   ${maleChecked}  >Male<br>
-    <input type="radio" name="gender" onchange="genderfilter(this, ALL)"    value="All"    ${allChecked}   >All<br>`
-}
-  
-  
-function genderfilter(checkbox, gender) {
-  if(checkbox.checked === true){  
-    console.log(gender)
-    const filteredByGender = window.laureates.filter(laureate => gender === ALL || laureate.gender === gender)
-    submitCriteria(filteredByGender, gender)
-  }
-}
-
-  
-</script>
 </body>
 </html>
