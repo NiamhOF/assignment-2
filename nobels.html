@@ -15,18 +15,20 @@
     <h1>Nobel Prize Winners</h1>
     <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across all categories for any year or years and from any country.</p>
     <p id="error"></p>
-    <div class="selectLook" style="200px;">
-    <select id="startYear"></select><p>Select start year</p>
-    <select id="endYear"></select>
-    <p>Select end year</p>
-    <select id="categories"></select>
-    <p>Select prize category</p>
-    <select id="bornCountry"></select>
-    <p>Select country</p>
+    <div id="criteria">
+      <div class="selectLook" style="200px;">
+      <div id="start"><p><b>Start year</b></p><select id="startYear"></select></div>
+      <div id="end"><p><b>End year</b></p><select id="endYear"></select>
+      </div>
+      <div id="cat"><p><b>Prize category</b></p><select id="categories"></select>
+      </div>
+      <div id="count"><p><b>Country of Birth</b></p><select id="bornCountry"></select>
+      </div>
+      </div>
+      <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
+      <div id="gendertoggle"></div>
+      <div id="filterNobels"></div>
     </div>
-    <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
-    <div id="gendertoggle"></div>
-    <div id="filterNobels"></div>
   </div>
 </body>
 </html>
