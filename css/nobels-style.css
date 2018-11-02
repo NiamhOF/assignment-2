@@ -1,3 +1,17 @@
+body {
+  margin: 0px;
+  font-family: 'Roboto', sans-serif;
+  background-color: lightgray
+}
+
+.contents {
+  min-width: 250px;
+  max-width: 1000px;
+  margin: auto;
+  background-color: white;
+  padding: 20px;
+}
+
 h1 {
   display: inline;
   position: relative;
@@ -5,8 +19,8 @@ h1 {
   width: 100%;
   text-align: left;
   color: darkorange;
-  font-size: 25px;
-  font-weight: bold;
+  font-size: 30px;
+  font-weight: bolder;
 }
 
 p {
@@ -14,7 +28,63 @@ p {
   position: relative;
   display: block;
   text-align: left;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
   margin: 10px;
+}
+
+select {
+  position: relative;
+  margin: 10px;
+  font-size: 12px;
+  color: dimgrey;
+  background-color: lightgray;
+}
+
+select:hover {
+  background-color: darkorange;
+  color: white; 
+}
+
+button {
+  background-color: lightgray;
+  border: .5px solid dimgrey;
+  color: dimgrey;
+  font-size: 12px;
+  padding: 10px 20px;
+  position: relative;
+  margin: 10px;
+}
+
+button:hover {
+  background-color: darkorange;
+  color: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: dimgrey;
+}
+
+td, th {
+  width: 25%;
+  text-align: left;
+  height: 40px;
+  padding: 5px;
+}
+
+
+th {
+  background-color: darkorange;
+  color: white;
+  height: 40px;
+}
+
+tr:hover {
+  background-color: darkorange;
+}
+
+.displayInfo {
+  height: 5px;
 }

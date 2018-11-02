@@ -131,9 +131,9 @@ function submitCriteria(laureates, gender) {
     return country === ALL || laureate.bornCountry !== undefined && laureate.bornCountry.toLowerCase() === country.toLowerCase()
   })
   
-  //Define the constant filteredByYears which gets all years that range from greater than or equal to the chosen start year and less than of equal to the chosen end year. 
+  //Define the constant filteredByAll which takes the filteredByCountries constant and filters it by the selected year range and on the selected category.
   
-  const filteredByYears = filteredByCountries.filter(laureate => laureate.prizes.some(prize => {
+  const filteredByAll = filteredByCountries.filter(laureate => laureate.prizes.some(prize => {
     var isStartYear = parseInt(prize.year) >= parseInt(startYear)
     var isEndYear = parseInt(prize.year) <= parseInt(endYear)
     var isInRange = isStartYear && isEndYear
@@ -144,7 +144,7 @@ function submitCriteria(laureates, gender) {
   
   //Creates template - fill in values
   
-  const filteredLaureates = removeOtherCategories(filteredByYears, category)
+  const filteredLaureates = removeOtherCategories(filteredByAll, category)
   window.filteredLaureates = filteredLaureates
   const header = '<table><tr><th>Firstname</th><th>Surname</th><th>Category</th><th>Year</th></tr>'
   var id = -1
@@ -184,6 +184,7 @@ function displayDetailedInfo(id) {
     tableRowExtra.innerHTML = ``
   }
 }
+
 
 //The map() method creates a new array with the results of calling a provided function on every element in the calling array.
 

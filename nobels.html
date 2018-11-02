@@ -5,24 +5,28 @@
   <meta charset="utf-8"> 
   <meta name="assignment 2" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./css/nobels-style.css">
-  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <title>Assignment 2</title>
   <script src="./javascript/nobels.js"></script>
     
 </head>
 <body>  
-
-  <h1>Nobel Prize Winners</h1>
-  <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across five categories for any year.</p>
-  <p id="error"></p>
-
-  <select id="startYear">JSON file unavailable</select>
-  <select id="endYear">...</select>
-  <select id="categories">...</select>
-  <select id="bornCountry">...</select>
-  <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
-  <div id="gendertoggle"></div>
-  <div id="filterNobels"></div>
-
+  <div class="contents">
+    <h1>Nobel Prize Winners</h1>
+    <p>Between 1901 and 2018, the Nobel prizes have been awarded 590 times to 935 people and organisations. Below you can view the list of Noble Prize winners across all categories for any year or years and from any country.</p>
+    <p id="error"></p>
+    <div class="selectLook" style="200px;">
+    <select id="startYear"></select><p>Select start year</p>
+    <select id="endYear"></select>
+    <p>Select end year</p>
+    <select id="categories"></select>
+    <p>Select prize category</p>
+    <select id="bornCountry"></select>
+    <p>Select country</p>
+    </div>
+    <button onclick="submitCriteria(window.laureates, ALL)">Submit</button>
+    <div id="gendertoggle"></div>
+    <div id="filterNobels"></div>
+  </div>
 </body>
 </html>
